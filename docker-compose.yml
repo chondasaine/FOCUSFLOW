@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://focusflow_user:focusflow_password@db:5432/focusflow_db
+    depends_on:
+      - db
+    volumes:
+      - ./app:/code/app
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: focusflow_user
+      POSTGRES_PASSWORD: focusflow_password
+      POSTGRES_DB: focusflow_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - focusflow_postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+volumes:
+  focusflow_postgres_data:
