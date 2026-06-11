@@ -4,6 +4,8 @@ from app.database import test_database_connection, get_db, engine
 import app.models as models
 import app.schemas as schemas
 import app.crud as crud
+from datetime import datetime
+from app.analytics import calculate_weekly_summary
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -98,3 +100,10 @@ def get_metric_snapshot(metric_snapshot_id: int, db: Session = Depends(get_db)):
     if metric_snapshot is None:
         raise HTTPException(status_code=404, detail="Metric Snapshots are not found")
     return metric_snapshot
+
+@app.get("/people/{person_id}/weekly_summary")
+def get_weekly_summary(person_id: int, week_start: datetime, db: Session = Depends(get_db)):
+    result = calculate_weekly_summary(db=db, person_id=person_id, week_start=week_start)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Person not found")
+    return result

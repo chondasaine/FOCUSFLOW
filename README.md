@@ -35,7 +35,8 @@ app/
 ├── database.py
 ├── models.py
 ├── schemas.py
-└── crud.py
+├── crud.py
+└── analytics.py
 ```
 
 ## Database Overview
@@ -140,6 +141,24 @@ and trend analysis without recalculating from raw events every time.
 | created_at | | created_at |
 +---------------------------+ +---------------------------+
 
+## Fragmentation Score
+
+The fragmentation score is a number from 0 to 100 representing how
+fragmented a person's week was. Higher = more fragmented = less
+productive focus time.
+
+fragmentation_score = (interruption_count + email_count) / weekly_capacity_hours \* 100
+
+Capped at 100. Calculated automatically when the weekly summary
+endpoint is called.
+
+| Event Type     | Counts Toward      |
+| -------------- | ------------------ |
+| meeting        | meeting_hours      |
+| email          | email_count        |
+| direct_message | interruption_count |
+| interruption   | interruption_count |
+
 ## Roadmap
 
 - [x] Docker setup, PostgreSQL, FastAPI, health endpoints
@@ -147,7 +166,8 @@ and trend analysis without recalculating from raw events every time.
 - [x] project_assignments table
 - [x] operational_events table
 - [x] metric_snapshots table
-- [ ] Fragmentation score calculation engine
+- [x] Fragmentation score calculation engine
+- [ ] Seed data script
 - [ ] Microsoft 365 integration
 - [ ] Dashboard API
 
@@ -224,10 +244,11 @@ docker compose up --build
 
 ## Sprint Log
 
-| Sprint   | What was built                                             |
-| -------- | ---------------------------------------------------------- |
-| Sprint 1 | Docker setup, PostgreSQL, FastAPI, health endpoints        |
-| Sprint 2 | people and projects tables, CRUD endpoints, pgAdmin        |
-| Sprint 3 | project_assignments table, foreign keys, relationships     |
-| Sprint 4 | operational_events table, enum fields, JSON metadata field |
-| Sprint 5 | metric_snapshots table, pre-calculated weekly summaries    |
+| Sprint   | What was built                                                        |
+| -------- | --------------------------------------------------------------------- |
+| Sprint 1 | Docker setup, PostgreSQL, FastAPI, health endpoints                   |
+| Sprint 2 | people and projects tables, CRUD endpoints, pgAdmin                   |
+| Sprint 3 | project_assignments table, foreign keys, relationships                |
+| Sprint 4 | operational_events table, enum fields, JSON metadata field            |
+| Sprint 5 | metric_snapshots table, pre-calculated weekly summaries               |
+| Sprint 6 | Fragmentation score calculator, weekly summary endpoint, EST timezone |
