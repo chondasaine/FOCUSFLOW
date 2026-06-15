@@ -36,7 +36,8 @@ app/
 ├── models.py
 ├── schemas.py
 ├── crud.py
-└── analytics.py
+├── analytics.py
+└── seed.py
 ```
 
 ## Database Overview
@@ -99,18 +100,20 @@ interruptions — for each person. This is the heart of the system.
 
 Stores pre-calculated weekly summaries per person. Powers dashboards
 and trend analysis without recalculating from raw events every time.
+`capacity_hours` stores the actual capacity for that specific week.
 
-| Column              | Type      | Notes                                |
-| ------------------- | --------- | ------------------------------------ |
-| id                  | SERIAL    | Primary key, auto-increment          |
-| person_id           | INTEGER   | Foreign key → people.id              |
-| week_start          | TIMESTAMP | Start of the week being summarised   |
-| meeting_hours       | FLOAT     | Total meeting hours, defaults to 0.0 |
-| email_count         | INTEGER   | Total emails, defaults to 0          |
-| interruption_count  | INTEGER   | Total interruptions, defaults to 0   |
-| focus_hours         | FLOAT     | Total focus hours, defaults to 0.0   |
-| fragmentation_score | FLOAT     | Calculated score 0-100, optional     |
-| created_at          | TIMESTAMP | Auto-set on insert                   |
+| Column              | Type      | Notes                                     |
+| ------------------- | --------- | ----------------------------------------- |
+| id                  | SERIAL    | Primary key, auto-increment               |
+| person_id           | INTEGER   | Foreign key → people.id                   |
+| week_start          | TIMESTAMP | Start of the week being summarised        |
+| meeting_hours       | FLOAT     | Total meeting hours, defaults to 0.0      |
+| email_count         | INTEGER   | Total emails, defaults to 0               |
+| interruption_count  | INTEGER   | Total interruptions, defaults to 0        |
+| capacity_hours      | FLOAT     | Actual capacity for this week, default 40 |
+| focus_hours         | FLOAT     | Total focus hours, defaults to 0.0        |
+| fragmentation_score | FLOAT     | Calculated score 0-100, optional          |
+| created_at          | TIMESTAMP | Auto-set on insert                        |
 
 ### ERD
 
@@ -159,6 +162,25 @@ endpoint is called.
 | direct_message | interruption_count |
 | interruption   | interruption_count |
 
+## Seed Data
+
+The seed script generates 4 weeks of realistic operational data
+simulating a startup under revenue pressure with a project in crisis.
+
+```bash
+docker exec -it focusflow-api-1 python app/seed.py
+```
+
+| Week   | Narrative                        | Events |
+| ------ | -------------------------------- | ------ |
+| Week 1 | Baseline — busy but manageable   | 227    |
+| Week 2 | Project trouble starts           | 373    |
+| Week 3 | Full crisis — peak fragmentation | 584    |
+| Week 4 | Stabilising                      | 434    |
+
+People: Chonda Saine, Sondra Williams, Collin Warner, Will Segal,
+Matt Barnes, Gabriel Leads across 4 active client projects.
+
 ## Roadmap
 
 - [x] Docker setup, PostgreSQL, FastAPI, health endpoints
@@ -167,9 +189,10 @@ endpoint is called.
 - [x] operational_events table
 - [x] metric_snapshots table
 - [x] Fragmentation score calculation engine
-- [ ] Seed data script
+- [x] Seed data script with 4 weeks of realistic data
+- [ ] Team dashboard API
 - [ ] Microsoft 365 integration
-- [ ] Dashboard API
+- [ ] Per-person trend analysis
 
 ## Stack
 
@@ -252,3 +275,4 @@ docker compose up --build
 | Sprint 4 | operational_events table, enum fields, JSON metadata field            |
 | Sprint 5 | metric_snapshots table, pre-calculated weekly summaries               |
 | Sprint 6 | Fragmentation score calculator, weekly summary endpoint, EST timezone |
+| Sprint 7 | Seed data script, 1618 events across 4 weeks, capacity fix            |

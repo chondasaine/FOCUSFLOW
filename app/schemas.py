@@ -62,6 +62,7 @@ class MetricSnapshotCreate(BaseModel):
     meeting_hours: float
     email_count: int
     interruption_count: int
+    capacity_hours: float = 40.0
     focus_hours: float
     fragmentation_score: Optional[float] = None
 

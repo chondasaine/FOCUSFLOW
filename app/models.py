@@ -66,6 +66,7 @@ class MetricSnapshots(Base):
     meeting_hours = Column(Float, nullable=False, default=0.0)
     email_count = Column(Integer, nullable=False, default=0)
     interruption_count = Column(Integer, nullable=False, default=0)
+    capacity_hours = Column(Float, nullable=False, default=40.0)
     focus_hours = Column(Float, nullable=False, default=0.0)
     fragmentation_score = Column(Float, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

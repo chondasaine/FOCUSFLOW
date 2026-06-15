@@ -12,7 +12,7 @@ def get_week_boundaries(week_start: datetime):
     week_end_est = week_start_est + timedelta(days=7)
     return week_start_est, week_end_est
 
-def calculate_weekly_summary(db: Session, person_id: int, week_start: datetime):
+def calculate_weekly_summary(db: Session, person_id: int, week_start: datetime, capacity_hours: float = None):
     person = db.query(Person).filter(Person.id == person_id).first()
     if person is None:
         return None
@@ -57,7 +57,7 @@ def calculate_weekly_summary(db: Session, person_id: int, week_start: datetime):
         if e.event_type in [EventType.direct_message, EventType.interruption]
     )
 
-    weekly_capacity = person.weekly_capacity_hours or 40.0
+    weekly_capacity = capacity_hours or person.weekly_capacity_hours or 40.0
     focus_hours = round(max(weekly_capacity - meeting_hours, 0), 2)
 
     raw_score = (interruption_count + email_count) / weekly_capacity * 100
@@ -70,7 +70,8 @@ def calculate_weekly_summary(db: Session, person_id: int, week_start: datetime):
         email_count=email_count,
         interruption_count=interruption_count,
         focus_hours=focus_hours,
-        fragmentation_score=fragmentation_score
+        fragmentation_score=fragmentation_score,
+        capacity_hours=weekly_capacity
     )
     db.add(snapshot)
     db.commit()
