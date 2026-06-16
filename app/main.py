@@ -5,7 +5,7 @@ import app.models as models
 import app.schemas as schemas
 import app.crud as crud
 from datetime import datetime
-from app.analytics import calculate_weekly_summary
+from app.analytics import calculate_weekly_summary, get_team_dashboard, get_person_trend
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -107,3 +107,17 @@ def get_weekly_summary(person_id: int, week_start: datetime, db: Session = Depen
     if result is None:
         raise HTTPException(status_code=404, detail="Person not found")
     return result
+
+# Dashboard endpoints
+@app.get("/dashboard/weekly")
+def get_weekly_dashboard(week_start: datetime, db: Session = Depends(get_db)):
+    result = get_team_dashboard(db=db, week_start=week_start)
+    return result
+
+@app.get("/people/{person_id}/trend")
+def get_person_trend_endpoint(person_id: int, db: Session = Depends(get_db)):
+    result = get_person_trend(db=db, person_id=person_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Person not found")
+    return result
+

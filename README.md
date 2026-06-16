@@ -190,9 +190,10 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 - [x] metric_snapshots table
 - [x] Fragmentation score calculation engine
 - [x] Seed data script with 4 weeks of realistic data
-- [ ] Team dashboard API
+- [x] Team dashboard API with week-over-week trend
+- [x] Per-person 4 week trend endpoint
+- [ ] Simple frontend dashboard
 - [ ] Microsoft 365 integration
-- [ ] Per-person trend analysis
 
 ## Stack
 
@@ -227,11 +228,13 @@ docker compose up --build
 
 ### People
 
-| Method | Endpoint     | Description     |
-| ------ | ------------ | --------------- |
-| POST   | /people      | Create a person |
-| GET    | /people      | List all people |
-| GET    | /people/{id} | Get one person  |
+| Method | Endpoint                    | Description                       |
+| ------ | --------------------------- | --------------------------------- |
+| POST   | /people                     | Create a person                   |
+| GET    | /people                     | List all people                   |
+| GET    | /people/{id}                | Get one person                    |
+| GET    | /people/{id}/weekly_summary | Get weekly summary for one person |
+| GET    | /people/{id}/trend          | Get 4 week trend for one person   |
 
 ### Projects
 
@@ -265,14 +268,21 @@ docker compose up --build
 | GET    | /metric_snapshots      | List all snapshots |
 | GET    | /metric_snapshots/{id} | Get one snapshot   |
 
+### Dashboard
+
+| Method | Endpoint          | Description                                   |
+| ------ | ----------------- | --------------------------------------------- |
+| GET    | /dashboard/weekly | All team members for one week with trend data |
+
 ## Sprint Log
 
-| Sprint   | What was built                                                        |
-| -------- | --------------------------------------------------------------------- |
-| Sprint 1 | Docker setup, PostgreSQL, FastAPI, health endpoints                   |
-| Sprint 2 | people and projects tables, CRUD endpoints, pgAdmin                   |
-| Sprint 3 | project_assignments table, foreign keys, relationships                |
-| Sprint 4 | operational_events table, enum fields, JSON metadata field            |
-| Sprint 5 | metric_snapshots table, pre-calculated weekly summaries               |
-| Sprint 6 | Fragmentation score calculator, weekly summary endpoint, EST timezone |
-| Sprint 7 | Seed data script, 1618 events across 4 weeks, capacity fix            |
+| Sprint   | What was built                                                  |
+| -------- | --------------------------------------------------------------- |
+| Sprint 1 | Docker setup, PostgreSQL, FastAPI, health endpoints             |
+| Sprint 2 | people and projects tables, CRUD endpoints, pgAdmin             |
+| Sprint 3 | project_assignments table, foreign keys, relationships          |
+| Sprint 4 | operational_events table, enum fields, JSON metadata field      |
+| Sprint 5 | metric_snapshots table, pre-calculated weekly summaries         |
+| Sprint 6 | Fragmentation score calculator, weekly summary endpoint         |
+| Sprint 7 | Seed data script, 1618 events across 4 weeks, capacity fix      |
+| Sprint 8 | Team dashboard API, week-over-week trend, person trend endpoint |
