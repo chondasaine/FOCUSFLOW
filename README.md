@@ -18,6 +18,15 @@ interruptions, and focus windows, it gives managers and teams the evidence
 they need to have honest conversations about workload, capacity, and
 organisational design.
 
+## License
+
+Copyright (c) 2026 Chonda Saine. All rights reserved.
+
+This software is proprietary and confidential. It may be viewed for
+evaluation and portfolio purposes only. No license is granted to use,
+copy, modify, or distribute this software without express written
+permission from the copyright owner.
+
 ## Privacy Principles
 
 FocusFlow is not an HR tool and is not designed for performance monitoring.
@@ -30,14 +39,22 @@ FocusFlow is not an HR tool and is not designed for performance monitoring.
 ## File Structure
 
 ```
-app/
-├── main.py
-├── database.py
-├── models.py
-├── schemas.py
-├── crud.py
-├── analytics.py
-└── seed.py
+FocusFlow/
+├── app/
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── crud.py
+│   ├── analytics.py
+│   └── seed.py
+├── frontend/
+│   └── index.html
+├── LICENSE
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
 ```
 
 ## Database Overview
@@ -192,7 +209,8 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 - [x] Seed data script with 4 weeks of realistic data
 - [x] Team dashboard API with week-over-week trend
 - [x] Per-person 4 week trend endpoint
-- [ ] Simple frontend dashboard
+- [x] Simple frontend dashboard
+- [ ] Deploy to Railway
 - [ ] Microsoft 365 integration
 
 ## Stack
@@ -204,6 +222,8 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 | ORM        | SQLAlchemy 2.0 |
 | Validation | Pydantic v2    |
 | Container  | Docker         |
+| Frontend   | HTML/CSS/JS    |
+| Charts     | Chart.js 4.4.1 |
 
 ## Running the App
 
@@ -216,6 +236,18 @@ docker compose up --build
 | API                | http://localhost:8000      |
 | API Docs (Swagger) | http://localhost:8000/docs |
 | pgAdmin            | http://localhost:5050      |
+
+## Frontend
+
+Open the dashboard in your browser after starting Docker:
+
+```bash
+open frontend/index.html
+```
+
+Or drag `frontend/index.html` into a Chrome window.
+
+The dashboard connects to the API at `http://localhost:8000` automatically.
 
 ## API Endpoints
 
@@ -286,3 +318,4 @@ docker compose up --build
 | Sprint 6 | Fragmentation score calculator, weekly summary endpoint         |
 | Sprint 7 | Seed data script, 1618 events across 4 weeks, capacity fix      |
 | Sprint 8 | Team dashboard API, week-over-week trend, person trend endpoint |
+| Sprint 9 | Frontend dashboard, team cards, trend charts, week selector     |
