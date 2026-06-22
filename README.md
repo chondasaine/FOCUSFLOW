@@ -35,6 +35,7 @@ FocusFlow is not an HR tool and is not designed for performance monitoring.
 - Data is used to identify organisational patterns, not to evaluate individuals
 - The goal is to give teams and managers insight to make structural changes
 - Individuals own visibility into their own data
+- Team summary views aggregate by role, never by individual name
 
 ## File Structure
 
@@ -209,9 +210,15 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 - [x] Seed data script with 4 weeks of realistic data
 - [x] Team dashboard API with week-over-week trend
 - [x] Per-person 4 week trend endpoint
-- [x] Simple frontend dashboard
+- [x] Frontend dashboard with branding and dark mode
+- [x] Team health summary with role-level aggregation
+- [x] Unique constraint on metric_snapshots
+- [ ] AI insights engine
 - [ ] Deploy to Railway
 - [ ] Microsoft 365 integration
+- [ ] API usage logging — tokens, cost, cache hit rate
+- [ ] Per-org API key management
+- [ ] User authentication and multi-tenancy
 
 ## Stack
 
@@ -308,14 +315,15 @@ The dashboard connects to the API at `http://localhost:8000` automatically.
 
 ## Sprint Log
 
-| Sprint   | What was built                                                  |
-| -------- | --------------------------------------------------------------- |
-| Sprint 1 | Docker setup, PostgreSQL, FastAPI, health endpoints             |
-| Sprint 2 | people and projects tables, CRUD endpoints, pgAdmin             |
-| Sprint 3 | project_assignments table, foreign keys, relationships          |
-| Sprint 4 | operational_events table, enum fields, JSON metadata field      |
-| Sprint 5 | metric_snapshots table, pre-calculated weekly summaries         |
-| Sprint 6 | Fragmentation score calculator, weekly summary endpoint         |
-| Sprint 7 | Seed data script, 1618 events across 4 weeks, capacity fix      |
-| Sprint 8 | Team dashboard API, week-over-week trend, person trend endpoint |
-| Sprint 9 | Frontend dashboard, team cards, trend charts, week selector     |
+| Sprint    | What was built                                                  |
+| --------- | --------------------------------------------------------------- |
+| Sprint 1  | Docker setup, PostgreSQL, FastAPI, health endpoints             |
+| Sprint 2  | people and projects tables, CRUD endpoints, pgAdmin             |
+| Sprint 3  | project_assignments table, foreign keys, relationships          |
+| Sprint 4  | operational_events table, enum fields, JSON metadata field      |
+| Sprint 5  | metric_snapshots table, pre-calculated weekly summaries         |
+| Sprint 6  | Fragmentation score calculator, weekly summary endpoint         |
+| Sprint 7  | Seed data script, 1618 events across 4 weeks, capacity fix      |
+| Sprint 8  | Team dashboard API, week-over-week trend, person trend endpoint |
+| Sprint 9  | Frontend dashboard, team cards, trend charts, week selector     |
+| Sprint 10 | Branding, dark mode, team health summary, unique constraint     |

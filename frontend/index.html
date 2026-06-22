@@ -1,11 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FocusFlow Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <style>
+      :root {
+        --navy: #1a1a2e;
+        --teal: #00b4d8;
+        --teal-light: #90e0ef;
+        --green: #38a169;
+        --amber: #d97706;
+        --red: #e53e3e;
+        --bg: #f4f6f9;
+        --surface: #ffffff;
+        --border: #e2e8f0;
+        --text-primary: #1a1a2e;
+        --text-secondary: #4a5568;
+        --text-muted: #718096;
+        --stat-bg: #f7fafc;
+      }
+
+      [data-theme="dark"] {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #2d3748;
+        --text-primary: #f7fafc;
+        --text-secondary: #cbd5e0;
+        --text-muted: #718096;
+        --stat-bg: #2d3748;
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
@@ -14,61 +40,194 @@
 
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f4f6f9;
-        color: #1a1a2e;
+        background: var(--bg);
+        color: var(--text-primary);
+        transition:
+          background 0.2s,
+          color 0.2s;
       }
 
       header {
-        background: #1a1a2e;
+        background: var(--navy);
         color: white;
-        padding: 1.25rem 2rem;
+        padding: 1rem 2rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
       }
 
-      header h1 {
-        font-size: 1.4rem;
-        font-weight: 600;
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
       }
-      header p {
-        font-size: 0.85rem;
-        opacity: 0.7;
-        margin-top: 2px;
+
+      .logo svg {
+        width: 36px;
+        height: 36px;
+      }
+
+      .logo-text h1 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: -0.02em;
+      }
+
+      .logo-text p {
+        font-size: 0.78rem;
+        color: var(--teal-light);
+        margin-top: 1px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .dark-toggle {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: background 0.2s;
+      }
+
+      .dark-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
       }
 
       .controls {
-        background: white;
-        padding: 1rem 2rem;
-        border-bottom: 1px solid #e2e8f0;
+        background: var(--surface);
+        padding: 0.875rem 2rem;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         gap: 1rem;
       }
 
       .controls label {
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         font-weight: 500;
-        color: #4a5568;
+        color: var(--text-secondary);
       }
 
       .controls select {
         padding: 0.4rem 0.75rem;
-        border: 1px solid #cbd5e0;
+        border: 1px solid var(--border);
         border-radius: 6px;
-        font-size: 0.9rem;
-        background: white;
+        font-size: 0.88rem;
+        background: var(--surface);
+        color: var(--text-primary);
         cursor: pointer;
       }
 
       .main {
-        padding: 2rem;
+        padding: 1.5rem 2rem;
+      }
+
+      /* Team Health Summary */
+      .health-summary {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .health-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .health-title {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .team-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .status-label {
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
+
+      .status-healthy .status-dot {
+        background: #38a169;
+      }
+      .status-healthy .status-label {
+        color: #38a169;
+      }
+      .status-atrisk .status-dot {
+        background: #d97706;
+      }
+      .status-atrisk .status-label {
+        color: #d97706;
+      }
+      .status-critical .status-dot {
+        background: #e53e3e;
+      }
+      .status-critical .status-label {
+        color: #e53e3e;
+      }
+
+      .health-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .health-stat {
+        background: var(--stat-bg);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+      }
+
+      .health-stat-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+      }
+
+      .health-stat-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .health-stat-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 2px;
       }
 
       .section-title {
-        font-size: 1rem;
+        font-size: 0.88rem;
         font-weight: 600;
-        color: #2d3748;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         margin-bottom: 1rem;
       }
 
@@ -76,14 +235,14 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
       }
 
       .person-card {
-        background: white;
+        background: var(--surface);
         border-radius: 10px;
         padding: 1.25rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border);
         cursor: pointer;
         transition:
           transform 0.15s,
@@ -92,7 +251,8 @@
 
       .person-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        border-color: var(--teal);
       }
 
       .card-header {
@@ -103,22 +263,29 @@
       }
 
       .person-name {
-        font-size: 1rem;
+        font-size: 0.98rem;
         font-weight: 600;
+        color: var(--text-primary);
       }
+
       .person-role {
-        font-size: 0.78rem;
-        color: #718096;
-        margin-top: 2px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 3px;
+        line-height: 1.4;
+      }
+
+      .score-block {
+        text-align: center;
       }
 
       .score-badge {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
         font-weight: 700;
         padding: 0.3rem 0.7rem;
         border-radius: 8px;
-        min-width: 60px;
-        text-align: center;
+        min-width: 64px;
+        display: inline-block;
       }
 
       .score-low {
@@ -135,10 +302,10 @@
       }
 
       .trend {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         margin-top: 4px;
-        text-align: center;
         font-weight: 500;
+        text-align: center;
       }
 
       .trend-worse {
@@ -148,7 +315,7 @@
         color: #38a169;
       }
       .trend-unchanged {
-        color: #718096;
+        color: var(--text-muted);
       }
 
       .card-stats {
@@ -158,14 +325,14 @@
       }
 
       .stat {
-        background: #f7fafc;
+        background: var(--stat-bg);
         border-radius: 6px;
         padding: 0.5rem 0.75rem;
       }
 
       .stat-label {
-        font-size: 0.72rem;
-        color: #718096;
+        font-size: 0.7rem;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.04em;
       }
@@ -173,16 +340,25 @@
       .stat-value {
         font-size: 1rem;
         font-weight: 600;
-        color: #2d3748;
+        color: var(--text-primary);
         margin-top: 1px;
       }
 
+      .click-hint {
+        text-align: center;
+        font-size: 0.72rem;
+        color: var(--teal);
+        margin-top: 0.75rem;
+      }
+
+      /* Trend Section */
       .trend-section {
-        background: white;
+        background: var(--surface);
         border-radius: 10px;
         padding: 1.5rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border);
         display: none;
+        margin-bottom: 2rem;
       }
 
       .trend-section.visible {
@@ -199,63 +375,85 @@
       .trend-header h2 {
         font-size: 1rem;
         font-weight: 600;
+        color: var(--text-primary);
       }
 
       .close-btn {
         background: none;
-        border: 1px solid #cbd5e0;
+        border: 1px solid var(--border);
         border-radius: 6px;
         padding: 0.3rem 0.75rem;
         cursor: pointer;
-        font-size: 0.85rem;
-        color: #4a5568;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
       }
 
       .close-btn:hover {
-        background: #f7fafc;
+        background: var(--stat-bg);
       }
 
       .trend-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 1.25rem;
-        font-size: 0.88rem;
+        font-size: 0.85rem;
       }
 
       .trend-table th {
         text-align: left;
         padding: 0.5rem 0.75rem;
-        background: #f7fafc;
-        color: #4a5568;
+        background: var(--stat-bg);
+        color: var(--text-secondary);
         font-weight: 600;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid var(--border);
       }
 
       .trend-table td {
         padding: 0.6rem 0.75rem;
-        border-bottom: 1px solid #f0f4f8;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
       }
 
       .loading {
         text-align: center;
         padding: 3rem;
-        color: #718096;
+        color: var(--text-muted);
         font-size: 0.95rem;
       }
 
       .error {
         text-align: center;
         padding: 3rem;
-        color: #e53e3e;
+        color: var(--red);
         font-size: 0.95rem;
+      }
+
+      footer {
+        text-align: center;
+        padding: 1.5rem;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        margin-top: 1rem;
       }
     </style>
   </head>
   <body>
     <header>
-      <div>
-        <h1>FocusFlow</h1>
-        <p>Workload & Focus Fragmentation Dashboard</p>
+      <div class="logo">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="8" fill="#00b4d8" />
+          <path d="M10 10h16v4H14v4h10v4H14v8h-4V10z" fill="white" />
+          <circle cx="27" cy="27" r="4" fill="#1a1a2e" />
+          <circle cx="27" cy="27" r="2" fill="#00b4d8" />
+        </svg>
+        <div class="logo-text">
+          <h1>FocusFlow</h1>
+          <p>Workload & Fragmentation Analytics</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="dark-toggle" onclick="toggleDark()">🌙 Dark Mode</button>
       </div>
     </header>
 
@@ -276,7 +474,11 @@
     </div>
 
     <div class="main">
-      <p class="section-title">Team Fragmentation Overview</p>
+      <div class="health-summary" id="healthSummary">
+        <div class="loading">Loading team health...</div>
+      </div>
+
+      <p class="section-title">Individual Fragmentation Scores</p>
       <div class="team-grid" id="teamGrid">
         <div class="loading">Loading team data...</div>
       </div>
@@ -291,9 +493,29 @@
       </div>
     </div>
 
+    <footer>© 2026 Chonda Saine · FocusFlow · All rights reserved</footer>
+
     <script>
       const API = "http://localhost:8000";
       let trendChartInstance = null;
+
+      // Dark mode
+      function toggleDark() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute("data-theme") === "dark";
+        html.setAttribute("data-theme", isDark ? "light" : "dark");
+        localStorage.setItem("focusflow-theme", isDark ? "light" : "dark");
+        document.querySelector(".dark-toggle").textContent = isDark
+          ? "🌙 Dark Mode"
+          : "☀️ Light Mode";
+      }
+
+      // Restore theme on load
+      const savedTheme = localStorage.getItem("focusflow-theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      if (savedTheme === "dark") {
+        document.querySelector(".dark-toggle").textContent = "☀️ Light Mode";
+      }
 
       function getScoreClass(score) {
         if (score <= 40) return "score-low";
@@ -301,17 +523,24 @@
         return "score-high";
       }
 
+      function getStatusClass(avg) {
+        if (avg <= 40) return "status-healthy";
+        if (avg <= 70) return "status-atrisk";
+        return "status-critical";
+      }
+
+      function getStatusLabel(avg) {
+        if (avg <= 40) return "Healthy";
+        if (avg <= 70) return "At Risk";
+        return "Critical";
+      }
+
       function getTrendHTML(direction, trend) {
         if (direction === "no_previous_data")
-          return '<div class="trend" style="color:#718096">No previous data</div>';
+          return '<div class="trend" style="color:var(--text-muted)">First week</div>';
         const arrow =
           direction === "worse" ? "▲" : direction === "better" ? "▼" : "—";
-        const cls =
-          direction === "worse"
-            ? "trend-worse"
-            : direction === "better"
-              ? "trend-better"
-              : "trend-unchanged";
+        const cls = `trend-${direction}`;
         const label =
           direction === "worse"
             ? `+${trend} vs last week`
@@ -321,6 +550,81 @@
         return `<div class="trend ${cls}">${arrow} ${label}</div>`;
       }
 
+      function renderHealthSummary(team) {
+        const scores = team.map((p) => p.fragmentation_score || 0);
+        const avg = Math.round(
+          scores.reduce((a, b) => a + b, 0) / scores.length,
+        );
+        const statusClass = getStatusClass(avg);
+        const statusLabel = getStatusLabel(avg);
+        const totalMeetings = team
+          .reduce((a, p) => a + p.meeting_hours, 0)
+          .toFixed(1);
+        const totalInterruptions = team.reduce(
+          (a, p) => a + p.interruption_count,
+          0,
+        );
+        const totalEmails = team.reduce((a, p) => a + p.email_count, 0);
+
+        const mostDeterioration = team
+          .filter((p) => p.trend_direction === "worse")
+          .sort((a, b) => b.fragmentation_trend - a.fragmentation_trend)[0];
+
+        const mostImproved = team
+          .filter((p) => p.trend_direction === "better")
+          .sort((a, b) => a.fragmentation_trend - b.fragmentation_trend)[0];
+
+        const deteriorationHTML = mostDeterioration
+          ? `<div class="health-stat">
+           <div class="health-stat-label">Most Deteriorated Role</div>
+           <div class="health-stat-value" style="font-size:0.85rem">${mostDeterioration.role.split(" ")[0]}</div>
+           <div class="health-stat-sub">+${mostDeterioration.fragmentation_trend} pts vs last week</div>
+         </div>`
+          : "";
+
+        const improvedHTML = mostImproved
+          ? `<div class="health-stat">
+           <div class="health-stat-label">Most Improved Role</div>
+           <div class="health-stat-value" style="font-size:0.85rem">${mostImproved.role.split(" ")[0]}</div>
+           <div class="health-stat-sub">${mostImproved.fragmentation_trend} pts vs last week</div>
+         </div>`
+          : "";
+
+        document.getElementById("healthSummary").innerHTML = `
+      <div class="health-header">
+        <span class="health-title">Team Health Summary</span>
+        <div class="team-status ${statusClass}">
+          <div class="status-dot"></div>
+          <span class="status-label">${statusLabel}</span>
+        </div>
+      </div>
+      <div class="health-stats">
+        <div class="health-stat">
+          <div class="health-stat-label">Avg Fragmentation</div>
+          <div class="health-stat-value">${avg}<span style="font-size:0.8rem;font-weight:400"> / 100</span></div>
+          <div class="health-stat-sub">across ${team.length} team members</div>
+        </div>
+        <div class="health-stat">
+          <div class="health-stat-label">Total Meeting Hours</div>
+          <div class="health-stat-value">${totalMeetings}h</div>
+          <div class="health-stat-sub">team wide this week</div>
+        </div>
+        <div class="health-stat">
+          <div class="health-stat-label">Total Interruptions</div>
+          <div class="health-stat-value">${totalInterruptions}</div>
+          <div class="health-stat-sub">across all team members</div>
+        </div>
+        <div class="health-stat">
+          <div class="health-stat-label">Total Emails</div>
+          <div class="health-stat-value">${totalEmails}</div>
+          <div class="health-stat-sub">across all team members</div>
+        </div>
+        ${deteriorationHTML}
+        ${improvedHTML}
+      </div>
+    `;
+      }
+
       function renderTeam(data) {
         const grid = document.getElementById("teamGrid");
         if (!data.team || data.team.length === 0) {
@@ -328,6 +632,7 @@
             '<div class="error">No data found for this week.</div>';
           return;
         }
+        renderHealthSummary(data.team);
         grid.innerHTML = data.team
           .map(
             (person) => `
@@ -337,7 +642,7 @@
             <div class="person-name">${person.name}</div>
             <div class="person-role">${person.role}</div>
           </div>
-          <div>
+          <div class="score-block">
             <div class="score-badge ${getScoreClass(person.fragmentation_score)}">
               ${person.fragmentation_score}
             </div>
@@ -362,6 +667,7 @@
             <div class="stat-value">${person.focus_hours}h</div>
           </div>
         </div>
+        <div class="click-hint">Click to view 4 week trend →</div>
       </div>
     `,
           )
@@ -370,8 +676,10 @@
 
       async function loadDashboard() {
         const weekStart = document.getElementById("weekSelect").value;
-        const grid = document.getElementById("teamGrid");
-        grid.innerHTML = '<div class="loading">Loading team data...</div>';
+        document.getElementById("teamGrid").innerHTML =
+          '<div class="loading">Loading team data...</div>';
+        document.getElementById("healthSummary").innerHTML =
+          '<div class="loading">Loading team health...</div>';
         closeTrend();
         try {
           const res = await fetch(
@@ -380,8 +688,9 @@
           const data = await res.json();
           renderTeam(data);
         } catch (err) {
-          grid.innerHTML =
+          document.getElementById("teamGrid").innerHTML =
             '<div class="error">Could not connect to API. Is Docker running?</div>';
+          document.getElementById("healthSummary").innerHTML = "";
         }
       }
 
@@ -395,7 +704,6 @@
         try {
           const res = await fetch(`${API}/people/${personId}/trend`);
           const data = await res.json();
-
           const labels = data.weeks.map((w, i) => `Week ${i + 1}`);
           const scores = data.weeks.map((w) => w.fragmentation_score);
 
@@ -410,10 +718,11 @@
                   {
                     label: "Fragmentation Score",
                     data: scores,
-                    borderColor: "#e53e3e",
-                    backgroundColor: "rgba(229,62,62,0.1)",
+                    borderColor: "#00b4d8",
+                    backgroundColor: "rgba(0,180,216,0.1)",
                     borderWidth: 2,
                     pointRadius: 5,
+                    pointBackgroundColor: "#00b4d8",
                     tension: 0.3,
                     fill: true,
                   },
@@ -422,7 +731,13 @@
               options: {
                 responsive: true,
                 scales: {
-                  y: { min: 0, max: 100, ticks: { stepSize: 20 } },
+                  y: {
+                    min: 0,
+                    max: 100,
+                    ticks: { stepSize: 20 },
+                    grid: { color: "rgba(128,128,128,0.1)" },
+                  },
+                  x: { grid: { color: "rgba(128,128,128,0.1)" } },
                 },
                 plugins: { legend: { display: false } },
               },

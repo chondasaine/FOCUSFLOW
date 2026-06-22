@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, JSON, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, JSON, Enum, UniqueConstraint
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
@@ -70,5 +70,9 @@ class MetricSnapshots(Base):
     focus_hours = Column(Float, nullable=False, default=0.0)
     fragmentation_score = Column(Float, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint('person_id', 'week_start', name='uq_person_week'),
+    )
 
     
