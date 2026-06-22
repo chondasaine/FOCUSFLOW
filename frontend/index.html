@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FocusFlow Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #f4f6f9;
+        color: #1a1a2e;
+      }
+
+      header {
+        background: #1a1a2e;
+        color: white;
+        padding: 1.25rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      header h1 {
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+      header p {
+        font-size: 0.85rem;
+        opacity: 0.7;
+        margin-top: 2px;
+      }
+
+      .controls {
+        background: white;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .controls label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #4a5568;
+      }
+
+      .controls select {
+        padding: 0.4rem 0.75rem;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        background: white;
+        cursor: pointer;
+      }
+
+      .main {
+        padding: 2rem;
+      }
+
+      .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+      }
+
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .person-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.25rem;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+
+      .person-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+      }
+
+      .person-name {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .person-role {
+        font-size: 0.78rem;
+        color: #718096;
+        margin-top: 2px;
+      }
+
+      .score-badge {
+        font-size: 1.4rem;
+        font-weight: 700;
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+        min-width: 60px;
+        text-align: center;
+      }
+
+      .score-low {
+        background: #c6f6d5;
+        color: #276749;
+      }
+      .score-mid {
+        background: #fefcbf;
+        color: #744210;
+      }
+      .score-high {
+        background: #fed7d7;
+        color: #9b2335;
+      }
+
+      .trend {
+        font-size: 0.8rem;
+        margin-top: 4px;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .trend-worse {
+        color: #e53e3e;
+      }
+      .trend-better {
+        color: #38a169;
+      }
+      .trend-unchanged {
+        color: #718096;
+      }
+
+      .card-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+
+      .stat {
+        background: #f7fafc;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .stat-label {
+        font-size: 0.72rem;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .stat-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-top: 1px;
+      }
+
+      .trend-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        display: none;
+      }
+
+      .trend-section.visible {
+        display: block;
+      }
+
+      .trend-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+      }
+
+      .trend-header h2 {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .close-btn {
+        background: none;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        padding: 0.3rem 0.75rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: #4a5568;
+      }
+
+      .close-btn:hover {
+        background: #f7fafc;
+      }
+
+      .trend-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.25rem;
+        font-size: 0.88rem;
+      }
+
+      .trend-table th {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        background: #f7fafc;
+        color: #4a5568;
+        font-weight: 600;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .trend-table td {
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid #f0f4f8;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 3rem;
+        color: #718096;
+        font-size: 0.95rem;
+      }
+
+      .error {
+        text-align: center;
+        padding: 3rem;
+        color: #e53e3e;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>FocusFlow</h1>
+        <p>Workload & Focus Fragmentation Dashboard</p>
+      </div>
+    </header>
+
+    <div class="controls">
+      <label for="weekSelect">Week:</label>
+      <select id="weekSelect">
+        <option value="2026-05-18T00:00:00">Week 1 — May 18 (Baseline)</option>
+        <option value="2026-05-25T00:00:00">
+          Week 2 — May 25 (Trouble Starts)
+        </option>
+        <option value="2026-06-01T00:00:00" selected>
+          Week 3 — Jun 1 (Crisis)
+        </option>
+        <option value="2026-06-08T00:00:00">
+          Week 4 — Jun 8 (Stabilising)
+        </option>
+      </select>
+    </div>
+
+    <div class="main">
+      <p class="section-title">Team Fragmentation Overview</p>
+      <div class="team-grid" id="teamGrid">
+        <div class="loading">Loading team data...</div>
+      </div>
+
+      <div class="trend-section" id="trendSection">
+        <div class="trend-header">
+          <h2 id="trendTitle">4 Week Trend</h2>
+          <button class="close-btn" onclick="closeTrend()">Close</button>
+        </div>
+        <canvas id="trendChart" height="100"></canvas>
+        <table class="trend-table" id="trendTable"></table>
+      </div>
+    </div>
+
+    <script>
+      const API = "http://localhost:8000";
+      let trendChartInstance = null;
+
+      function getScoreClass(score) {
+        if (score <= 40) return "score-low";
+        if (score <= 70) return "score-mid";
+        return "score-high";
+      }
+
+      function getTrendHTML(direction, trend) {
+        if (direction === "no_previous_data")
+          return '<div class="trend" style="color:#718096">No previous data</div>';
+        const arrow =
+          direction === "worse" ? "▲" : direction === "better" ? "▼" : "—";
+        const cls =
+          direction === "worse"
+            ? "trend-worse"
+            : direction === "better"
+              ? "trend-better"
+              : "trend-unchanged";
+        const label =
+          direction === "worse"
+            ? `+${trend} vs last week`
+            : direction === "better"
+              ? `${trend} vs last week`
+              : "Unchanged";
+        return `<div class="trend ${cls}">${arrow} ${label}</div>`;
+      }
+
+      function renderTeam(data) {
+        const grid = document.getElementById("teamGrid");
+        if (!data.team || data.team.length === 0) {
+          grid.innerHTML =
+            '<div class="error">No data found for this week.</div>';
+          return;
+        }
+        grid.innerHTML = data.team
+          .map(
+            (person) => `
+      <div class="person-card" onclick="loadTrend(${person.person_id}, '${person.name}')">
+        <div class="card-header">
+          <div>
+            <div class="person-name">${person.name}</div>
+            <div class="person-role">${person.role}</div>
+          </div>
+          <div>
+            <div class="score-badge ${getScoreClass(person.fragmentation_score)}">
+              ${person.fragmentation_score}
+            </div>
+            ${getTrendHTML(person.trend_direction, person.fragmentation_trend)}
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat">
+            <div class="stat-label">Meeting Hours</div>
+            <div class="stat-value">${person.meeting_hours}h</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Emails</div>
+            <div class="stat-value">${person.email_count}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Interruptions</div>
+            <div class="stat-value">${person.interruption_count}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Focus Hours</div>
+            <div class="stat-value">${person.focus_hours}h</div>
+          </div>
+        </div>
+      </div>
+    `,
+          )
+          .join("");
+      }
+
+      async function loadDashboard() {
+        const weekStart = document.getElementById("weekSelect").value;
+        const grid = document.getElementById("teamGrid");
+        grid.innerHTML = '<div class="loading">Loading team data...</div>';
+        closeTrend();
+        try {
+          const res = await fetch(
+            `${API}/dashboard/weekly?week_start=${weekStart}`,
+          );
+          const data = await res.json();
+          renderTeam(data);
+        } catch (err) {
+          grid.innerHTML =
+            '<div class="error">Could not connect to API. Is Docker running?</div>';
+        }
+      }
+
+      async function loadTrend(personId, personName) {
+        document.getElementById("trendTitle").textContent =
+          `${personName} — 4 Week Trend`;
+        document.getElementById("trendSection").classList.add("visible");
+        document.getElementById("trendTable").innerHTML =
+          "<tr><td>Loading...</td></tr>";
+
+        try {
+          const res = await fetch(`${API}/people/${personId}/trend`);
+          const data = await res.json();
+
+          const labels = data.weeks.map((w, i) => `Week ${i + 1}`);
+          const scores = data.weeks.map((w) => w.fragmentation_score);
+
+          if (trendChartInstance) trendChartInstance.destroy();
+          trendChartInstance = new Chart(
+            document.getElementById("trendChart"),
+            {
+              type: "line",
+              data: {
+                labels,
+                datasets: [
+                  {
+                    label: "Fragmentation Score",
+                    data: scores,
+                    borderColor: "#e53e3e",
+                    backgroundColor: "rgba(229,62,62,0.1)",
+                    borderWidth: 2,
+                    pointRadius: 5,
+                    tension: 0.3,
+                    fill: true,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                scales: {
+                  y: { min: 0, max: 100, ticks: { stepSize: 20 } },
+                },
+                plugins: { legend: { display: false } },
+              },
+            },
+          );
+
+          document.getElementById("trendTable").innerHTML = `
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Score</th>
+            <th>Meetings</th>
+            <th>Emails</th>
+            <th>Interruptions</th>
+            <th>Focus Hours</th>
+            <th>Capacity</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.weeks
+            .map(
+              (w, i) => `
+            <tr>
+              <td>Week ${i + 1}</td>
+              <td><strong>${w.fragmentation_score}</strong></td>
+              <td>${w.meeting_hours}h</td>
+              <td>${w.email_count}</td>
+              <td>${w.interruption_count}</td>
+              <td>${w.focus_hours}h</td>
+              <td>${w.capacity_hours}h</td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </tbody>
+      `;
+
+          document
+            .getElementById("trendSection")
+            .scrollIntoView({ behavior: "smooth" });
+        } catch (err) {
+          document.getElementById("trendTable").innerHTML =
+            "<tr><td>Error loading trend data.</td></tr>";
+        }
+      }
+
+      function closeTrend() {
+        document.getElementById("trendSection").classList.remove("visible");
+        if (trendChartInstance) {
+          trendChartInstance.destroy();
+          trendChartInstance = null;
+        }
+      }
+
+      document
+        .getElementById("weekSelect")
+        .addEventListener("change", loadDashboard);
+      loadDashboard();
+    </script>
+  </body>
+</html>

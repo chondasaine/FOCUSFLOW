@@ -6,11 +6,20 @@ import app.schemas as schemas
 import app.crud as crud
 from datetime import datetime
 from app.analytics import calculate_weekly_summary, get_team_dashboard, get_person_trend
+from fastapi.middleware.cors import CORSMiddleware
 
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="FocusFlow API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 def health_check():
