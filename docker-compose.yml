@@ -5,6 +5,7 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql+psycopg://focusflow_user:focusflow_password@db:5432/focusflow_db
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     depends_on:
       - db
     volumes:

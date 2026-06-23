@@ -41,6 +41,7 @@ FocusFlow is not an HR tool and is not designed for performance monitoring.
 
 ```
 FocusFlow/
+
 ├── app/
 │   ├── main.py
 │   ├── database.py
@@ -50,7 +51,10 @@ FocusFlow/
 │   ├── analytics.py
 │   └── seed.py
 ├── frontend/
-│   └── index.html
+│   ├── index.html
+│   ├── styles.css
+│   ├── api.js
+│   └── app.js
 ├── LICENSE
 ├── docker-compose.yml
 ├── Dockerfile
@@ -180,6 +184,19 @@ endpoint is called.
 | direct_message | interruption_count |
 | interruption   | interruption_count |
 
+## AI Insights
+
+FocusFlow includes an on-demand AI insights engine powered by the
+Anthropic API. Clicking **Generate Insights** on the dashboard sends
+compressed team fragmentation data to Claude and returns a 3-4 sentence
+plain English summary of organisational patterns and recommendations.
+
+- On-demand only — never runs automatically
+- Results cached in the browser per week — no duplicate API calls
+- Role-level language only — no individual names in insights
+- Token usage displayed per call for cost transparency
+- Approximately 600 tokens per call — less than $0.001 per insight
+
 ## Seed Data
 
 The seed script generates 4 weeks of realistic operational data
@@ -213,7 +230,7 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 - [x] Frontend dashboard with branding and dark mode
 - [x] Team health summary with role-level aggregation
 - [x] Unique constraint on metric_snapshots
-- [ ] AI insights engine
+- [x] AI insights engine — on-demand, cached, role-level
 - [ ] Deploy to Railway
 - [ ] Microsoft 365 integration
 - [ ] API usage logging — tokens, cost, cache hit rate
@@ -231,6 +248,7 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 | Container  | Docker         |
 | Frontend   | HTML/CSS/JS    |
 | Charts     | Chart.js 4.4.1 |
+| AI         | Anthropic API  |
 
 ## Running the App
 
@@ -313,6 +331,12 @@ The dashboard connects to the API at `http://localhost:8000` automatically.
 | ------ | ----------------- | --------------------------------------------- |
 | GET    | /dashboard/weekly | All team members for one week with trend data |
 
+### Insights
+
+| Method | Endpoint         | Description                            |
+| ------ | ---------------- | -------------------------------------- |
+| GET    | /insights/weekly | AI generated team insight for one week |
+
 ## Sprint Log
 
 | Sprint    | What was built                                                  |
@@ -327,3 +351,4 @@ The dashboard connects to the API at `http://localhost:8000` automatically.
 | Sprint 8  | Team dashboard API, week-over-week trend, person trend endpoint |
 | Sprint 9  | Frontend dashboard, team cards, trend charts, week selector     |
 | Sprint 10 | Branding, dark mode, team health summary, unique constraint     |
+| Sprint 11 | AI insights engine, frontend refactored into separate files     |

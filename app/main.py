@@ -5,7 +5,7 @@ import app.models as models
 import app.schemas as schemas
 import app.crud as crud
 from datetime import datetime
-from app.analytics import calculate_weekly_summary, get_team_dashboard, get_person_trend
+from app.analytics import calculate_weekly_summary, get_team_dashboard, get_person_trend, generate_team_insights
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -129,4 +129,11 @@ def get_person_trend_endpoint(person_id: int, db: Session = Depends(get_db)):
     if result is None:
         raise HTTPException(status_code=404, detail="Person not found")
     return result
+
+#AI Insights endpoint
+@app.get("/insights/weekly")
+def get_weekly_insights(week_start: datetime, db: Session = Depends(get_db)):
+    result = generate_team_insights(db=db, week_start=week_start)
+    return result
+
 

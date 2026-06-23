@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from datetime import datetime, timedelta
 import pytz
+import os
+import anthropic
 from app.models import OperationalEvent, MetricSnapshots, Person, EventType
 
 
@@ -186,4 +188,75 @@ def get_person_trend(db: Session, person_id: int):
         "role": person.role,
         "weeks": weeks,
         "message": "Trend data retrieved successfully."
+    }
+
+def generate_team_insights(db: Session, week_start: datetime) -> dict:
+    dashboard = get_team_dashboard(db=db, week_start=week_start)
+
+    if not dashboard["team"]:
+        return {
+            "insight": "No data available for this week.",
+            "cached": False,
+            "week_start": dashboard["week_start"]
+        }
+
+    team = dashboard["team"]
+    avg_score = round(sum(p["fragmentation_score"] or 0 for p in team) / len(team), 1)
+    total_meetings = round(sum(p["meeting_hours"] for p in team), 1)
+    total_interruptions = sum(p["interruption_count"] for p in team)
+    total_emails = sum(p["email_count"] for p in team)
+
+    most_deteriorated = next(
+        (p for p in sorted(team, key=lambda x: x.get("fragmentation_trend") or 0, reverse=True)
+         if p.get("trend_direction") == "worse"), None
+    )
+
+    most_improved = next(
+        (p for p in sorted(team, key=lambda x: x.get("fragmentation_trend") or 0)
+         if p.get("trend_direction") == "better"), None
+    )
+
+    compressed = f"""
+Week: {dashboard["week_start"]}
+Team size: {len(team)}
+Average fragmentation score: {avg_score}/100
+Team status: {("Critical" if avg_score > 70 else "At Risk" if avg_score > 40 else "Healthy")}
+Total meeting hours across team: {total_meetings}h
+Total interruptions across team: {total_interruptions}
+Total emails across team: {total_emails}
+
+Role breakdown:
+{chr(10).join(f"- {p['role']}: score {p['fragmentation_score']}, {p['meeting_hours']}h meetings, {p['email_count']} emails, {p['interruption_count']} interruptions, trend: {p['trend_direction']}" for p in team)}
+
+Most deteriorated role: {most_deteriorated['role'] if most_deteriorated else 'none'} ({f"+{most_deteriorated['fragmentation_trend']} pts" if most_deteriorated else 'n/a'})
+Most improved role: {most_improved['role'] if most_improved else 'none'} ({f"{most_improved['fragmentation_trend']} pts" if most_improved else 'n/a'})
+"""
+
+    client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+    message = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=300,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are an organisational analytics assistant for a startup.
+Analyse this team fragmentation data and provide exactly 3-4 sentences of insight.
+Focus on organisational patterns, workload distribution, and actionable recommendations.
+Use role names not individual names. Be direct and specific about what the numbers mean.
+Never use bullet points — write in plain prose only.
+
+Data:
+{compressed}"""
+            }
+        ]
+    )
+
+    insight = message.content[0].text
+
+    return {
+        "insight": insight,
+        "cached": False,
+        "week_start": dashboard["week_start"],
+        "tokens_used": message.usage.input_tokens + message.usage.output_tokens
     }
