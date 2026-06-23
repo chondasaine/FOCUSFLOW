@@ -314,5 +314,9 @@ function closeTrend() {
   }
 }
 
-document.getElementById("weekSelect").addEventListener("change", loadDashboard);
-loadDashboard();
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .getElementById("weekSelect")
+    .addEventListener("change", loadDashboard);
+  loadDashboard();
+});
