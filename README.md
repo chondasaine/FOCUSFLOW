@@ -2,6 +2,10 @@
 
 FocusFlow is an internal workload and focus-fragmentation analytics tool.
 
+## Live Demo
+
+[https://focusflow-api-848897600321.us-east1.run.app](https://focusflow-api-848897600321.us-east1.run.app)
+
 ## Why FocusFlow
 
 FocusFlow was born from a real management challenge: how do you advocate
@@ -231,7 +235,7 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 - [x] Team health summary with role-level aggregation
 - [x] Unique constraint on metric_snapshots
 - [x] AI insights engine — on-demand, cached, role-level
-- [ ] Deploy to Railway
+- [x] Deploy to Google Cloud Run
 - [ ] Microsoft 365 integration
 - [ ] API usage logging — tokens, cost, cache hit rate
 - [ ] Per-org API key management
@@ -252,6 +256,16 @@ Matt Barnes, Gabriel Leads across 4 active client projects.
 
 ## Running the App
 
+### Live Deployment
+
+The app is deployed and accessible at:
+
+[https://focusflow-api-848897600321.us-east1.run.app](https://focusflow-api-848897600321.us-east1.run.app)
+
+No setup required — just open the URL in your browser.
+
+### Local Development
+
 ```bash
 docker compose up --build
 ```
@@ -262,17 +276,11 @@ docker compose up --build
 | API Docs (Swagger) | http://localhost:8000/docs |
 | pgAdmin            | http://localhost:5050      |
 
-## Frontend
-
-Open the dashboard in your browser after starting Docker:
+After starting Docker run the seed script to populate the database:
 
 ```bash
-open frontend/index.html
+docker exec -it focusflow-api-1 python app/seed.py
 ```
-
-Or drag `frontend/index.html` into a Chrome window.
-
-The dashboard connects to the API at `http://localhost:8000` automatically.
 
 ## API Endpoints
 
@@ -352,3 +360,4 @@ The dashboard connects to the API at `http://localhost:8000` automatically.
 | Sprint 9  | Frontend dashboard, team cards, trend charts, week selector     |
 | Sprint 10 | Branding, dark mode, team health summary, unique constraint     |
 | Sprint 11 | AI insights engine, frontend refactored into separate files     |
+| Sprint 12 | Google Cloud Run deployment, Cloud SQL, live public URL         |
