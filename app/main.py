@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.database import test_database_connection, get_db, engine
+import os
 import app.models as models
 import app.schemas as schemas
 import app.crud as crud
@@ -20,6 +23,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if os.path.exists("/code/frontend"):
+    app.mount("/static", StaticFiles(directory="/code/frontend"), name="static")
+
+@app.get("/")
+def serve_frontend():
+    return FileResponse("/code/frontend/index.html")
 
 @app.get("/health")
 def health_check():

@@ -1,4 +1,7 @@
-const API = "http://localhost:8000";
+const API =
+  window.location.origin === "http://127.0.0.1:5500"
+    ? "http://localhost:8000"
+    : window.location.origin;
 
 async function fetchDashboard(weekStart) {
   const res = await fetch(`${API}/dashboard/weekly?week_start=${weekStart}`);
